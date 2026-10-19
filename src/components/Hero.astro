@@ -23,7 +23,7 @@
     ShaderMaterial,
     Vector2,
     Vector3,
-    WebGLRenderer,
+    WebGLRenderer
   } from 'three';
   import GUI from 'lil-gui';
 
@@ -32,7 +32,10 @@
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
   camera.position.z = 1;
 
-  const renderer = new WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
+  const renderer = new WebGLRenderer({
+    antialias: false,
+    powerPreference: 'high-performance'
+  });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -40,7 +43,7 @@
     dpr: 1.0,
 
     camRotX: 0.15,
-    camRotY: 0.10,
+    camRotY: 0.1,
 
     color1: [0.016, 1.0, 0.0],
     color2: [0.784, 1.0, 0.0],
@@ -59,7 +62,7 @@
 
     rayX: 0.3,
     rayY: 0.25,
-    rayZ: 0.55,
+    rayZ: 0.55
   };
 
   renderer.setPixelRatio(params.dpr);
@@ -82,7 +85,7 @@
 
     u_scaleMult: { value: params.scaleMult },
     u_scaleAccum: { value: params.scaleAccum },
-    u_rays: { value: new Vector3(params.rayX, params.rayY, params.rayZ) },
+    u_rays: { value: new Vector3(params.rayX, params.rayY, params.rayZ) }
   };
 
   const vertexShader = `
@@ -238,7 +241,7 @@
     fragmentShader,
     uniforms,
     depthWrite: false,
-    depthTest: false,
+    depthTest: false
   });
 
   const plane = new Mesh(new PlaneGeometry(2, 2), material);
@@ -246,37 +249,94 @@
 
   const gui = new GUI({ title: 'Scene Settings' });
 
-  gui.add(params, 'dpr', 0.5, 2.0, 0.1).name('Device Pixel Ratio').onChange((val: number) => renderer.setPixelRatio(val));
+  gui
+    .add(params, 'dpr', 0.5, 2.0, 0.1)
+    .name('Device Pixel Ratio')
+    .onChange((val: number) => renderer.setPixelRatio(val));
 
   const camFolder = gui.addFolder('Camera Settings');
-  camFolder.add(params, 'camRotX', -0.5, 0.5, 0.01).name('Rotation X Speed').onChange((v: number) => (uniforms.u_camRotX.value = v));
-  camFolder.add(params, 'camRotY', -0.5, 0.5, 0.01).name('Rotation Y Speed').onChange((v: number) => (uniforms.u_camRotY.value = v));
+  camFolder
+    .add(params, 'camRotX', -0.5, 0.5, 0.01)
+    .name('Rotation X Speed')
+    .onChange((v: number) => (uniforms.u_camRotX.value = v));
+  camFolder
+    .add(params, 'camRotY', -0.5, 0.5, 0.01)
+    .name('Rotation Y Speed')
+    .onChange((v: number) => (uniforms.u_camRotY.value = v));
 
   const colorFolder = gui.addFolder('Colors');
-  colorFolder.addColor(params, 'color1').name('Color 1').onChange((v: number[]) => uniforms.u_color1.value.fromArray(v));
-  colorFolder.addColor(params, 'color2').name('Color 2').onChange((v: number[]) => uniforms.u_color2.value.fromArray(v));
-  colorFolder.addColor(params, 'color3').name('Color 3').onChange((v: number[]) => uniforms.u_color3.value.fromArray(v));
+  colorFolder
+    .addColor(params, 'color1')
+    .name('Color 1')
+    .onChange((v: number[]) => uniforms.u_color1.value.fromArray(v));
+  colorFolder
+    .addColor(params, 'color2')
+    .name('Color 2')
+    .onChange((v: number[]) => uniforms.u_color2.value.fromArray(v));
+  colorFolder
+    .addColor(params, 'color3')
+    .name('Color 3')
+    .onChange((v: number[]) => uniforms.u_color3.value.fromArray(v));
 
   const fractalFolder = gui.addFolder('Fractal Properties');
-  fractalFolder.add(params, 'warpFreq', 1.0, 100.0, 0.1).name('Warp Frequency').onChange((v: number) => (uniforms.u_warpFreq.value = v));
-  fractalFolder.add(params, 'warpAmp', -1.0, 1.0, 0.01).name('Warp Amplitude').onChange((v: number) => (uniforms.u_warpAmp.value = v));
-  fractalFolder.add(params, 'scaleMult', 1.0, 5.0, 0.01).name('Scale Multiplier').onChange((v: number) => (uniforms.u_scaleMult.value = v));
-  fractalFolder.add(params, 'scaleAccum', 1.0, 15.0, 0.01).name('Scale Accumulation').onChange((v: number) => (uniforms.u_scaleAccum.value = v));
+  fractalFolder
+    .add(params, 'warpFreq', 1.0, 100.0, 0.1)
+    .name('Warp Frequency')
+    .onChange((v: number) => (uniforms.u_warpFreq.value = v));
+  fractalFolder
+    .add(params, 'warpAmp', -1.0, 1.0, 0.01)
+    .name('Warp Amplitude')
+    .onChange((v: number) => (uniforms.u_warpAmp.value = v));
+  fractalFolder
+    .add(params, 'scaleMult', 1.0, 5.0, 0.01)
+    .name('Scale Multiplier')
+    .onChange((v: number) => (uniforms.u_scaleMult.value = v));
+  fractalFolder
+    .add(params, 'scaleAccum', 1.0, 15.0, 0.01)
+    .name('Scale Accumulation')
+    .onChange((v: number) => (uniforms.u_scaleAccum.value = v));
 
   const foldFolder = fractalFolder.addFolder('Asymmetric Folding');
-  foldFolder.add(params, 'foldX', 0.0, 2.0, 0.1).name('Fold X').onChange((v: number) => (uniforms.u_fold.value.x = v));
-  foldFolder.add(params, 'foldY', 0.0, 2.0, 0.1).name('Fold Y').onChange((v: number) => (uniforms.u_fold.value.y = v));
-  foldFolder.add(params, 'foldZ', 0.0, 2.0, 0.1).name('Fold Z').onChange((v: number) => (uniforms.u_fold.value.z = v));
+  foldFolder
+    .add(params, 'foldX', 0.0, 2.0, 0.1)
+    .name('Fold X')
+    .onChange((v: number) => (uniforms.u_fold.value.x = v));
+  foldFolder
+    .add(params, 'foldY', 0.0, 2.0, 0.1)
+    .name('Fold Y')
+    .onChange((v: number) => (uniforms.u_fold.value.y = v));
+  foldFolder
+    .add(params, 'foldZ', 0.0, 2.0, 0.1)
+    .name('Fold Z')
+    .onChange((v: number) => (uniforms.u_fold.value.z = v));
 
   const rotFolder = fractalFolder.addFolder('Rotations');
-  rotFolder.add(params, 'rotX', -3.14, 3.14, 0.01).name('Rotation X').onChange((v: number) => (uniforms.u_rot.value.x = v));
-  rotFolder.add(params, 'rotY', -3.14, 3.14, 0.01).name('Rotation Y').onChange((v: number) => (uniforms.u_rot.value.y = v));
-  rotFolder.add(params, 'rotZ', -3.14, 3.14, 0.01).name('Rotation Z').onChange((v: number) => (uniforms.u_rot.value.z = v));
+  rotFolder
+    .add(params, 'rotX', -3.14, 3.14, 0.01)
+    .name('Rotation X')
+    .onChange((v: number) => (uniforms.u_rot.value.x = v));
+  rotFolder
+    .add(params, 'rotY', -3.14, 3.14, 0.01)
+    .name('Rotation Y')
+    .onChange((v: number) => (uniforms.u_rot.value.y = v));
+  rotFolder
+    .add(params, 'rotZ', -3.14, 3.14, 0.01)
+    .name('Rotation Z')
+    .onChange((v: number) => (uniforms.u_rot.value.z = v));
 
   const raysFolder = fractalFolder.addFolder('Rays Thickness');
-  raysFolder.add(params, 'rayX', 0.0, 1.0, 0.01).name('Ray X Width').onChange((v: number) => (uniforms.u_rays.value.x = v));
-  raysFolder.add(params, 'rayY', 0.0, 1.0, 0.01).name('Ray Y Width').onChange((v: number) => (uniforms.u_rays.value.y = v));
-  raysFolder.add(params, 'rayZ', 0.0, 1.0, 0.01).name('Ray Z Width').onChange((v: number) => (uniforms.u_rays.value.z = v));
+  raysFolder
+    .add(params, 'rayX', 0.0, 1.0, 0.01)
+    .name('Ray X Width')
+    .onChange((v: number) => (uniforms.u_rays.value.x = v));
+  raysFolder
+    .add(params, 'rayY', 0.0, 1.0, 0.01)
+    .name('Ray Y Width')
+    .onChange((v: number) => (uniforms.u_rays.value.y = v));
+  raysFolder
+    .add(params, 'rayZ', 0.0, 1.0, 0.01)
+    .name('Ray Z Width')
+    .onChange((v: number) => (uniforms.u_rays.value.z = v));
 
   gui.close();
 
